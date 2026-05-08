@@ -1,7 +1,7 @@
 # Auto Content Factory - SKILL.md
 
 ## 🎯 技能目标
-自动化内容工厂：自动注册 Seedance 2.0 获取免费积分，制作视频并上传到 YouTube 赚钱。
+自动化内容工厂：使用 VEOAIFree 免费生成 Google VEO AI 视频，上传到 YouTube 赚钱。
 
 ## ⚠️ 关键约束与注意事项
 - **数据安全**：所有账户信息必须通过环境变量读取，严禁硬编码
@@ -12,108 +12,110 @@
 
 ## 🚀 工作流程
 
-### 阶段1：Seedance 注册
-1. 读取环境变量配置
-2. 启动 Playwright 浏览器
-3. 导航到注册页面
-4. 填写注册表单（邮箱、密码）
-5. 处理验证码（人工介入或自动）
-6. 提交注册
-7. 验证注册成功，获取积分
+### 阶段1：VEOAIFree 视频生成
+1. 启动 Playwright 浏览器
+2. 导航到 https://veoaifree.com/veo-video-generator/
+3. 输入视频描述提示词
+4. 选择 VEO 版本 (3.0 或 2.0)
+5. 选择视频比例 (16:9/9:16/1:1)
+6. 点击生成按钮
+7. 等待视频生成完成
+8. 下载生成的视频
 
-### 阶段2：视频制作
-1. 使用 Seedance API 或网页自动化生成视频
-2. 下载生成的视频到本地
-3. 记录视频文件路径
-
-### 阶段3：YouTube 上传
+### 阶段2：YouTube 上传
 1. 登录 YouTube Studio
 2. 上传视频文件
 3. 填写标题、描述、标签
-4. 设置发布时间
-5. 发布视频
+4. 发布视频
 
 ## 📂 模块结构
 
 ```
 auto-content-factory/
 ├── skills/
-│   └── SKILL.md           # 本文件
+│   └── SKILL.md              # 本文件
 ├── scripts/
-│   ├── seedance_register.py    # Seedance 注册
-│   ├── seedance_generator.py   # 视频生成
-│   ├── youtube_uploader.py     # YouTube 上传
-│   └── main.py                # 主入口
+│   ├── main.py               # 主入口
+│   ├── veoaifree_generator.py # VEOAIFree 视频生成
+│   └── youtube_uploader.py    # YouTube 上传
 ├── mcp/
 │   └── playwright_server.py   # Playwright MCP Server
 ├── config/
-│   └── .env.example           # 环境变量模板
+│   └── .env.example          # 环境变量模板
 └── logs/
-    └── automation.log         # 日志文件
+    └── screenshots/          # 截图目录
 ```
 
 ## 🔧 环境变量配置
 
 ```bash
-# Seedance 配置
-SEEDANCE_URL=https://www.seedance.tv
-SEEDANCE_EMAIL=your_email@gmail.com
-SEEDANCE_PASSWORD=your_password
-
 # YouTube 配置
 YOUTUBE_EMAIL=your_email@gmail.com
 YOUTUBE_PASSWORD=your_password
-YOUTUBE_CHANNEL_ID=your_channel_id
 
-# 通用配置
+# 浏览器配置
 HEADLESS=false
+SLOW_MO=100
+
+# 路径配置
 SCREENSHOT_DIR=./logs/screenshots
+VIDEO_OUTPUT_DIR=./output/videos
+LOG_FILE=./logs/automation.log
 ```
 
-## 📋 页面对象模型 (POM) 规范
+## 🛠️ VEOAIFree 特性
 
-### RegisterPage
-```python
-class RegisterPage:
-    def enter_email(self, email)
-    def enter_password(self, password)
-    def click_sign_up(self)
-    def handle_captcha(self)
-    def wait_for_success(self)
-```
-
-### YouTubeUploadPage
-```python
-class YouTubeUploadPage:
-    def navigate_to_upload(self)
-    def upload_video(self, file_path)
-    def set_title(self, title)
-    def set_description(self, description)
-    def add_tags(self, tags)
-    def publish(self)
-```
-
-## 🛠️ 依赖安装
-
-```bash
-pip install playwright
-playwright install chromium
-pip install python-dotenv google-api-python-client
-```
+- ✅ **完全免费** - 无需注册账号
+- ✅ **无限使用** - 无次数限制
+- ✅ **Google VEO AI** - 支持 VEO 2.0 和 3.0
+- ✅ **无水印** - 视频无任何水印
+- ✅ **快速生成** - AI 智能加速渲染
 
 ## 📖 使用方法
 
 ```bash
-# 1. 配置环境变量
+# 1. 安装依赖
+pip install -r requirements.txt
+
+# 2. 配置环境变量
 cp config/.env.example config/.env
 vim config/.env
 
-# 2. 运行完整流程
+# 3. 生成视频
+python scripts/veoaifree_generator.py "A sunset over mountains"
+
+# 4. 指定版本和比例
+python scripts/veoaifree_generator.py "Futuristic city" 3.0 16:9
+
+# 5. 上传到 YouTube
+python scripts/main.py --mode upload --video ./video.mp4 --title "My AI Video"
+
+# 6. 完整流水线
 python scripts/main.py --mode full
-
-# 3. 仅注册 Seedance
-python scripts/main.py --mode register
-
-# 4. 仅上传 YouTube
-python scripts/main.py --mode upload --video path/to/video.mp4
 ```
+
+## 🎬 提示词示例
+
+```
+A majestic mountain landscape at sunrise with golden light
+Futuristic city with flying cars and neon lights at night
+Peaceful ocean waves crashing on a tropical beach
+Northern lights dancing across the Arctic sky
+Cherry blossoms falling in a traditional Japanese garden
+Aerial view of a forest with misty morning fog
+Wild horses running across a green meadow
+A cozy coffee shop with rain outside the window
+```
+
+## 📊 支持的参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| --mode | 运行模式 | full |
+| --prompt | 视频提示词 | 随机选择 |
+| --version | VEO 版本 (3.0/2.0) | 3.0 |
+| --ratio | 视频比例 (16:9/9:16/1:1) | 16:9 |
+| --video | 视频路径 (上传模式) | - |
+| --title | YouTube 标题 | 默认 |
+| --description | YouTube 描述 | 默认 |
+| --tags | YouTube 标签 (逗号分隔) | 默认 |
